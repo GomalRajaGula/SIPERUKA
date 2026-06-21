@@ -5,6 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $id_pengajuan
+ * @property int $id_ruangan
+ * @property string $tanggal_kegiatan
+ * @property string $waktu_mulai
+ * @property string $waktu_selesai
+ * @property \App\Models\Pengajuan $pengajuan
+ * @property \App\Models\Ruangan $ruangan
+ */
 class DetailPengajuan extends Model
 {
     use HasFactory;

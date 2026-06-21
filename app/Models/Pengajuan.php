@@ -5,6 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $id_user
+ * @property string|null $file_dokumen_pendukung
+ * @property string $status
+ * @property string|null $kode_tte
+ * @property \App\Models\User $user
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\DetailPengajuan[] $detailPengajuans
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Jadwal[] $jadwals
+ */
 class Pengajuan extends Model
 {
     use HasFactory;

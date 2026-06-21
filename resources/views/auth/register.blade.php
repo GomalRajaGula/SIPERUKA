@@ -28,14 +28,12 @@
             <div class="absolute -top-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full blur-2xl"></div>
             <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl"></div>
 
-            <!-- Header: Logo & Title -->
-            <div class="relative z-10">
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-md">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
+            <!-- Logo -->
+            <div class="mb-10 text-center relative z-10">
+                <div class="inline-flex items-center justify-center p-1 rounded-2xl bg-white shadow-xl shadow-blue-500/20 mb-4 ring-1 ring-slate-100">
+                    <img src="{{ asset('images/logo.png') }}" alt="SIPERUKA Logo" class="w-16 h-16 rounded-xl object-contain">
+                </div>
+                <div class="flex items-center justify-center gap-3">
                     <span class="text-lg font-extrabold tracking-tight">SIPERUKA-PNC</span>
                 </div>
             </div>

@@ -15,7 +15,9 @@ class AuthController extends Controller
      */
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->stateless()->redirect();
+        /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+        $driver = Socialite::driver('google');
+        return $driver->stateless()->redirect();
     }
 
     /**
@@ -24,13 +26,17 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var \Laravel\Socialite\Two\AbstractProvider $driver */
+            $driver = Socialite::driver('google');
+            /** @var \Laravel\Socialite\Two\User $googleUser */
+            $googleUser = $driver->stateless()->user();
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Gagal melakukan login dengan Google: ' . $e->getMessage());
         }
 
         // 1. Check if a user with the given google_id already exists.
-        $user = User::where('google_id', $googleUser->getId())->first();
+        /** @var User|null $user */
+        $user = User::query()->where([['google_id', '=', $googleUser->getId()]])->first();
 
         if ($user) {
             // Update token if it has changed
@@ -43,7 +49,8 @@ class AuthController extends Controller
         }
 
         // 2. If not, check if the email already exists in the database.
-        $existingUser = User::where('email', $googleUser->getEmail())->first();
+        /** @var User|null $existingUser */
+        $existingUser = User::query()->where([['email', '=', $googleUser->getEmail()]])->first();
 
         if ($existingUser) {
             $existingUser->update([
@@ -62,12 +69,13 @@ class AuthController extends Controller
         
         // Ensure username uniqueness
         $count = 1;
-        while (User::where('username', $username)->exists()) {
+        while (User::query()->where([['username', '=', $username]])->exists()) {
             $username = $baseUsername . $count;
             $count++;
         }
 
-        $newUser = User::create([
+        /** @var User $newUser */
+        $newUser = User::query()->create([
             'username' => $username,
             'nama' => $googleUser->getName(),
             'email' => $googleUser->getEmail(),
@@ -93,7 +101,8 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::create([
+        /** @var User $user */
+        $user = User::query()->create([
             'nama' => $request->nama,
             'username' => $request->username,
             'email' => $request->email,
@@ -133,5 +142,16 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'Kredensial yang Anda masukkan tidak cocok dengan data kami.',
         ])->onlyInput('email');
+    }
+
+    /**
+     * Handle logout request.
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login');
     }
 }

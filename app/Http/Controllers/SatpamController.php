@@ -25,8 +25,9 @@ class SatpamController extends Controller
         ]);
 
         // Query the pengajuan table along with user (pemohon) and room detail relations
-        $pengajuan = Pengajuan::with(['user', 'detailPengajuans.ruangan'])
-            ->where('kode_tte', $request->kode_tte)
+        /** @var Pengajuan|null $pengajuan */
+        $pengajuan = Pengajuan::query()->with(['user', 'detailPengajuans.ruangan']) // [CHANGED]
+            ->where([['kode_tte', '=', $request->kode_tte]]) // [CHANGED]
             ->first();
 
         if (!$pengajuan) {
@@ -36,6 +37,7 @@ class SatpamController extends Controller
             ], 404);
         }
 
+        /** @var \App\Models\DetailPengajuan|null $detail */
         $detail = $pengajuan->detailPengajuans->first();
         
         $data = [
