@@ -127,7 +127,7 @@ class DashboardController extends Controller
             'status'          => $pengajuan->status,
             'kode_tte'        => $pengajuan->kode_tte ?? '-',
             'file_dokumen'    => $pengajuan->file_dokumen_pendukung
-                ? asset('storage/' . $pengajuan->file_dokumen_pendukung)
+                ? route('baak.pengajuan.dokumen', $pengajuan->id)
                 : null,
             'pemohon'         => [
                 'nama'     => $pengajuan->user?->nama ?? 'Unknown',

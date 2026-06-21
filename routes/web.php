@@ -60,6 +60,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pengajuan/{id}', [DashboardController::class, 'showDetail'])->name('pengajuan.detail');
         Route::post('/pengajuan/{id}/approve', [DashboardController::class, 'approve'])->name('pengajuan.approve');
         Route::post('/pengajuan/{id}/reject', [DashboardController::class, 'reject'])->name('pengajuan.reject');
+        Route::get('/pengajuan/{id}/surat-izin', [PengajuanController::class, 'suratIzinBaak'])->name('pengajuan.surat-izin');
+        Route::get('/pengajuan/{id}/dokumen', [PengajuanController::class, 'downloadDokumenBaak'])->name('pengajuan.dokumen');
 
         // Kelola Ruangan (CRUD)
         Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');

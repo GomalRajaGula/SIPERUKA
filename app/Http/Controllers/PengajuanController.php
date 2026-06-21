@@ -80,7 +80,7 @@ class PengajuanController extends Controller
     }
 
     /**
-     * Show the printable permit letter (Surat Izin) for approved request.
+     * Show the printable permit letter (Surat Izin) for approved request (Mahasiswa).
      *
      * @param  int  $id
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
@@ -95,5 +95,48 @@ class PengajuanController extends Controller
         }
 
         return view('mahasiswa.surat-izin', compact('pengajuan'));
+    }
+
+    /**
+     * Show the printable permit letter (Surat Izin) for BAAK.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function suratIzinBaak($id)
+    {
+        $pengajuan = Pengajuan::with(['user', 'detailPengajuans.ruangan'])->findOrFail($id);
+
+        if ($pengajuan->status !== 'approved') {
+            return redirect()->route('dashboard.baak')->with('error', 'Pengajuan belum disetujui, surat izin belum tersedia.');
+        }
+
+        return view('mahasiswa.surat-izin', compact('pengajuan'));
+    }
+
+    /**
+     * View the uploaded PDF document (for BAAK).
+     *
+     * @param  int  $id
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse
+     */
+    public function downloadDokumenBaak($id)
+    {
+        $pengajuan = Pengajuan::findOrFail($id);
+        
+        if (!$pengajuan->file_dokumen_pendukung) {
+            return redirect()->back()->with('error', 'Dokumen pendukung tidak tersedia.');
+        }
+
+        $path = storage_path('app/public/' . $pengajuan->file_dokumen_pendukung);
+
+        if (!file_exists($path)) {
+            return redirect()->back()->with('error', 'File dokumen tidak ditemukan di server.');
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="Surat_Pengajuan_' . $pengajuan->id . '.pdf"'
+        ]);
     }
 }

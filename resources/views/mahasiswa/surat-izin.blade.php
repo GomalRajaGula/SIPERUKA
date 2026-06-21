@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Izin Peminjaman Ruangan - PMJ-{{ str_pad($pengajuan->id, 4, '0', STR_PAD_LEFT) }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* A4 Page Styling */
