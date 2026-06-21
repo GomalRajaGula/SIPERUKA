@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SatpamController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -11,6 +12,19 @@ Route::get('/', function () {
 Route::get('/login', function () {
     return 'Halaman Login - Silakan Autentikasi';
 })->name('login');
+
+// Google Authentication Routes
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+// Dashboard Route Placeholder
+Route::get('/dashboard', function () {
+    if (auth()->check()) {
+        $role = auth()->user()->role;
+        return redirect()->route($role . '.dashboard');
+    }
+    return redirect()->route('login');
+})->middleware(['auth'])->name('dashboard');
 
 // Route Group protected by auth & role middleware
 Route::middleware(['auth'])->group(function () {
