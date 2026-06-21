@@ -15,7 +15,7 @@ class AuthController extends Controller
      */
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Gagal melakukan login dengan Google: ' . $e->getMessage());
         }
@@ -79,5 +79,59 @@ class AuthController extends Controller
 
         Auth::login($newUser);
         return redirect()->intended('/dashboard');
+    }
+
+    /**
+     * Handle manual registration request.
+     */
+    public function register(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'username' => 'required|string|max:255|unique:users,username',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'nama' => $request->nama,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'mahasiswa', // default role
+        ]);
+
+        Auth::login($user);
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Handle manual login request.
+     */
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        // Attempt login using either email or username (NIM)
+        $loginField = filter_var($credentials['email'], FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        $authData = [
+            $loginField => $credentials['email'],
+            'password' => $credentials['password'],
+        ];
+
+        if (Auth::attempt($authData, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+
+            return redirect()->intended('/dashboard');
+        }
+
+        return back()->withErrors([
+            'email' => 'Kredensial yang Anda masukkan tidak cocok dengan data kami.',
+        ])->onlyInput('email');
     }
 }

@@ -3,53 +3,48 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SatpamController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Route Login Placeholder
+// Authentication Routes
 Route::get('/login', function () {
-    return 'Halaman Login - Silakan Autentikasi';
+    return view('auth.login');
 })->name('login');
+
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+Route::post('/register', [AuthController::class, 'register']);
 
 // Google Authentication Routes
 Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-// Dashboard Route Placeholder
-Route::get('/dashboard', function () {
-    if (auth()->check()) {
-        $role = auth()->user()->role;
-        return redirect()->route($role . '.dashboard');
-    }
-    return redirect()->route('login');
-})->middleware(['auth'])->name('dashboard');
+// Generic Dashboard Route
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 // Route Group protected by auth & role middleware
 Route::middleware(['auth'])->group(function () {
 
-    // 1. Mahasiswa (Pemohon) Routes
-    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-        Route::get('/dashboard', function () {
-            return 'Dashboard Mahasiswa';
-        })->name('dashboard');
+    // 1. Dashboard Sub-routes
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/mahasiswa', [DashboardController::class, 'mahasiswa'])->middleware(['role:mahasiswa'])->name('dashboard.mahasiswa');
+        Route::get('/baak', [DashboardController::class, 'baak'])->middleware(['role:baak'])->name('dashboard.baak');
+        Route::get('/satpam', [DashboardController::class, 'satpam'])->middleware(['role:satpam'])->name('dashboard.satpam');
+    });
 
+    // 2. Functional Portal Routes (Mahasiswa)
+    Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/pengajuan', function () {
             return view('mahasiswa.pengajuan');
         })->name('pengajuan');
     });
 
-    // 2. BAAK (Verifikator) Routes
-    Route::middleware(['role:baak'])->prefix('baak')->name('baak.')->group(function () {
-        Route::get('/dashboard', function () {
-            return 'Dashboard BAAK - Verifikator';
-        })->name('dashboard');
-    });
-
-    // 3. Satpam (Validator Lapangan) Routes
+    // 3. Functional Portal Routes (Satpam)
     Route::middleware(['role:satpam'])->prefix('satpam')->name('satpam.')->group(function () {
-        Route::get('/dashboard', [SatpamController::class, 'dashboard'])->name('dashboard');
         Route::post('/verify', [SatpamController::class, 'verifyQr'])->name('verify');
     });
 });
