@@ -78,4 +78,22 @@ class PengajuanController extends Controller
 
         return redirect()->route('dashboard.mahasiswa')->with('success', 'Pengajuan peminjaman ruangan berhasil dikirim.');
     }
+
+    /**
+     * Show the printable permit letter (Surat Izin) for approved request.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function suratIzin($id)
+    {
+        $pengajuan = Pengajuan::with(['user', 'detailPengajuans.ruangan'])->findOrFail($id);
+
+        // Ensure the request belongs to the authenticated user and is approved
+        if ($pengajuan->id_user !== Auth::id() || $pengajuan->status !== 'approved') {
+            return redirect()->route('dashboard.mahasiswa')->with('error', 'Anda tidak memiliki akses ke surat izin ini atau pengajuan belum disetujui.');
+        }
+
+        return view('mahasiswa.surat-izin', compact('pengajuan'));
+    }
 }

@@ -9,8 +9,8 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\SettingsController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
-});
+    return view('landing');
+})->name('landing');
 
 // Authentication Routes
 Route::get('/login', function () {
@@ -51,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
         Route::get('/buat-pengajuan', [PengajuanController::class, 'create'])->name('buat-pengajuan');
         Route::post('/buat-pengajuan', [PengajuanController::class, 'store'])->name('buat-pengajuan.store');
+        Route::get('/pengajuan/{id}/surat-izin', [PengajuanController::class, 'suratIzin'])->name('pengajuan.surat-izin');
     });
 
     // 3. Functional Portal Routes (BAAK)
