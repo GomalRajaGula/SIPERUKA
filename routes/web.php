@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SatpamController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -34,8 +35,7 @@ Route::middleware(['auth'])->group(function () {
 
     // 3. Satpam (Validator Lapangan) Routes
     Route::middleware(['role:satpam'])->prefix('satpam')->name('satpam.')->group(function () {
-        Route::get('/dashboard', function () {
-            return 'Dashboard Satpam - Validator';
-        })->name('dashboard');
+        Route::get('/dashboard', [SatpamController::class, 'dashboard'])->name('dashboard');
+        Route::post('/verify', [SatpamController::class, 'verifyQr'])->name('verify');
     });
 });
